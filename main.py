@@ -28,22 +28,18 @@ def clean_game_data(json_file_path):
 
             cleaned_game['required_age'] = int(game_data.get('required_age', 0))  # default to 0
             cleaned_game['price'] = float(game_data.get('price', 0.0))  # default to 0.0
-            cleaned_game['website'] = game_data.get('website')
 
             # convert bool strings to actual booleans
             for field in ['windows', 'mac', 'linux']:
                 cleaned_game[field] = game_data.get(field) == True # standardize as True/False, handle nulls
 
             cleaned_game['metacritic_score'] = int(game_data.get('metacritic_score', 0))
-            cleaned_game['metacritic_url'] = game_data.get('metacritic_url')
             cleaned_game['achievements'] = int(game_data.get('achievements', 0))
             cleaned_game['recommendations'] = int(game_data.get('recommendations', 0))
-            cleaned_game['short_description'] = game_data.get('short_description')
 
             cleaned_game['user_score'] = int(game_data.get('user_score', 0))
             cleaned_game['positive'] = int(game_data.get('positive', 0))
             cleaned_game['negative'] = int(game_data.get('negative', 0))
-
 
             # clean estimated owners by removing spaces and converting to a numeric range
             estimated_owners = game_data.get('estimated_owners')
