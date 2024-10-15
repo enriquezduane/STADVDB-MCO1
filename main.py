@@ -89,7 +89,7 @@ def write_cleaned_data_to_file(cleaned_data, output_file_path):
 
 if __name__ == "__main__":
     json_file_path = 'dataset/games.json'
-    output_file_path = 'cleaned_games.json'
+    output_file_path = 'dataset/cleaned_games.json'
     cleaned_data = clean_game_data(json_file_path)
 
     if cleaned_data:
