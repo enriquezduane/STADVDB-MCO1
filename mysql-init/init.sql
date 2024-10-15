@@ -40,7 +40,6 @@ CREATE TABLE fact_game_sales (
     time_key INT,
     ownership_key INT,
     recommendations INT,
-    user_score DECIMAL(3, 1),
     positive_reviews INT,
     negative_reviews INT,
     average_playtime_forever INT,

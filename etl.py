@@ -49,12 +49,13 @@ def etl_process(data):
 
         # Insert into fact_game_sales
         fact_query = """INSERT INTO fact_game_sales (game_key, platform_key, time_key, ownership_key,
-                        recommendations, user_score, positive_reviews, negative_reviews,
+                        recommendations, positive_reviews, negative_reviews,
                         average_playtime_forever, peak_ccu)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"""
         fact_values = (game_key, platform_key, time_key, ownership_key,
-                       game['recommendations'], game['user_score'], game['positive'],
+                       game['recommendations'], game['positive'],
                        game['negative'], game['average_playtime_forever'], game['peak_ccu'])
+
         cursor.execute(fact_query, fact_values)
 
     db.commit()
