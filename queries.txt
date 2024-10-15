@@ -1,0 +1,85 @@
+ROLL UP
+
+This query rolls up the average metacritic score and total recommendations from individual games to the year level.
+
+SELECT 
+    dt.year,
+    AVG(dg.metacritic_score) AS avg_metacritic_score,
+    SUM(fgs.recommendations) AS total_recommendations
+FROM 
+    fact_game_sales fgs
+JOIN dim_game dg ON fgs.game_key = dg.game_key
+JOIN dim_time dt ON fgs.time_key = dt.time_key
+GROUP BY 
+    dt.year
+ORDER BY 
+    dt.year;
+
+DRILL DOWN
+
+This query starts with yearly data and drills down to monthly data for a specific year.
+
+SELECT 
+    dt.year,
+    dt.month,
+    COUNT(DISTINCT fgs.game_key) AS games_released,
+    AVG(dg.price) AS avg_price
+FROM 
+    fact_game_sales fgs
+JOIN dim_game dg ON fgs.game_key = dg.game_key
+JOIN dim_time dt ON fgs.time_key = dt.time_key
+WHERE 
+    dt.year = 2022  -- Replace with the desired year
+GROUP BY 
+    dt.year, dt.month
+ORDER BY 
+    dt.month;
+
+SLICE AND DICE
+
+This query slices the data to show only Windows games and dices it by price range and metacritic score.
+
+SELECT 
+    CASE 
+        WHEN dg.price < 10 THEN 'Under $10'
+        WHEN dg.price >= 10 AND dg.price < 30 THEN '$10 - $29.99'
+        ELSE '$30 and above'
+    END AS price_range,
+    CASE 
+        WHEN dg.metacritic_score < 50 THEN 'Low'
+        WHEN dg.metacritic_score >= 50 AND dg.metacritic_score < 75 THEN 'Medium'
+        ELSE 'High'
+    END AS metacritic_range,
+    COUNT(*) AS game_count
+FROM 
+    fact_game_sales fgs
+JOIN dim_game dg ON fgs.game_key = dg.game_key
+JOIN dim_platform dp ON fgs.platform_key = dp.platform_key
+WHERE 
+    dp.windows = TRUE
+GROUP BY 
+    price_range, metacritic_range
+ORDER BY 
+    price_range, metacritic_range;
+
+PIVOT
+
+This query pivots the data to show the number of games released for each platform combination by year.
+
+SELECT 
+    dt.year,
+    SUM(CASE WHEN dp.windows = TRUE AND dp.mac = FALSE AND dp.linux = FALSE THEN 1 ELSE 0 END) AS windows_only,
+    SUM(CASE WHEN dp.windows = FALSE AND dp.mac = TRUE AND dp.linux = FALSE THEN 1 ELSE 0 END) AS mac_only,
+    SUM(CASE WHEN dp.windows = FALSE AND dp.mac = FALSE AND dp.linux = TRUE THEN 1 ELSE 0 END) AS linux_only,
+    SUM(CASE WHEN dp.windows = TRUE AND dp.mac = TRUE AND dp.linux = FALSE THEN 1 ELSE 0 END) AS windows_mac,
+    SUM(CASE WHEN dp.windows = TRUE AND dp.mac = FALSE AND dp.linux = TRUE THEN 1 ELSE 0 END) AS windows_linux,
+    SUM(CASE WHEN dp.windows = FALSE AND dp.mac = TRUE AND dp.linux = TRUE THEN 1 ELSE 0 END) AS mac_linux,
+    SUM(CASE WHEN dp.windows = TRUE AND dp.mac = TRUE AND dp.linux = TRUE THEN 1 ELSE 0 END) AS all_platforms
+FROM 
+    fact_game_sales fgs
+JOIN dim_time dt ON fgs.time_key = dt.time_key
+JOIN dim_platform dp ON fgs.platform_key = dp.platform_key
+GROUP BY 
+    dt.year
+ORDER BY 
+    dt.year;
