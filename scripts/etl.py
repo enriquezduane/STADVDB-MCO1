@@ -3,7 +3,7 @@ import mysql.connector
 from datetime import datetime
 
 # Load JSON data
-with open('dataset/cleaned_games.json', 'r') as file:
+with open('../dataset/cleaned_games.json', 'r') as file:
     game_data = json.load(file)
 
 # Connect to MySQL database

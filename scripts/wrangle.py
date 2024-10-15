@@ -3,7 +3,6 @@ import re
 from datetime import datetime
 
 def clean_game_data(json_file_path):
-    """Cleans and transforms game data from a JSON file, returning a list of dictionaries."""
 
     try:
         with open(json_file_path, 'r', encoding='utf-8') as f:
@@ -87,8 +86,8 @@ def write_cleaned_data_to_file(cleaned_data, output_file_path):
         
 
 if __name__ == "__main__":
-    json_file_path = 'dataset/games.json'
-    output_file_path = 'dataset/cleaned_games.json'
+    json_file_path = '../dataset/games.json'
+    output_file_path = '../dataset/cleaned_games.json'
     cleaned_data = clean_game_data(json_file_path)
 
     if cleaned_data:
