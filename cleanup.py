@@ -37,7 +37,6 @@ def clean_game_data(json_file_path):
             cleaned_game['achievements'] = int(game_data.get('achievements', 0))
             cleaned_game['recommendations'] = int(game_data.get('recommendations', 0))
 
-            cleaned_game['user_score'] = int(game_data.get('user_score', 0))
             cleaned_game['positive'] = int(game_data.get('positive', 0))
             cleaned_game['negative'] = int(game_data.get('negative', 0))
 
