@@ -16,14 +16,14 @@ def clean_game_data(json_file_path):
             cleaned_game['game_id'] = int(game_id)
             cleaned_game['name'] = game_data.get('name')
 
-            try:  # date conversion
+            try:
                 release_date_str = game_data.get('release_date')
-                if release_date_str:
-                    cleaned_game['release_date'] = datetime.strptime(release_date_str, '%b %d, %Y').strftime('%Y-%m-%d') # YYYY-MM-DD
+                if release_date_str:  # Check for not null/empty string
+                    cleaned_game['release_date'] = datetime.strptime(release_date_str, '%b %d, %Y').strftime('%Y-%m-%d')
                 else:
-                    cleaned_game['release_date'] = None  # or another default value
+                    continue  # skip game if release_date is null/missing
             except ValueError:
-                cleaned_game['release_date'] = None
+                continue  # skip game if the date format is invalid
 
 
             cleaned_game['required_age'] = int(game_data.get('required_age', 0))  # default to 0
