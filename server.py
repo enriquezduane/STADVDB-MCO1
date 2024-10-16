@@ -112,16 +112,29 @@ app.layout = html.Div([
         dcc.Tab(label='Roll Up', children=[
             html.Div([
                 html.Div([
-                    html.Label("Start Year:", className="form-label"),
-                    dcc.Input(id='roll-up-start-year', type='number', value=2010, className="form-control"),
-                ], className="col-md-3"),
+                    html.Label("Year Range:", className="form-label"),
+                    dcc.RangeSlider(
+                        id='roll-up-year-slider',
+                        min=2010,
+                        max=2022,
+                        step=1,
+                        marks={i: str(i) for i in range(2010, 2023, 2)},
+                        value=[2010, 2022]
+                    ),
+                ], className="col-md-8"),
                 html.Div([
-                    html.Label("End Year:", className="form-label"),
-                    dcc.Input(id='roll-up-end-year', type='number', value=2022, className="form-control"),
-                ], className="col-md-3"),
-                html.Div([
-                    html.Button('Update', id='roll-up-update-button', n_clicks=0, className="btn btn-primary mt-4"),
-                ], className="col-md-2"),
+                    html.Label("Preset Ranges:", className="form-label"),
+                    dcc.Dropdown(
+                        id='roll-up-preset',
+                        options=[
+                            {'label': 'Last 5 Years', 'value': 'last_5'},
+                            {'label': 'Last Decade', 'value': 'last_10'},
+                            {'label': 'All Time', 'value': 'all_time'}
+                        ],
+                        value='all_time',
+                        className="form-select"
+                    ),
+                ], className="col-md-4"),
             ], className="row g-3 mb-3"),
             dcc.Graph(id='roll-up-graph')
         ]),
@@ -129,11 +142,27 @@ app.layout = html.Div([
             html.Div([
                 html.Div([
                     html.Label("Year:", className="form-label"),
-                    dcc.Input(id='drill-down-year', type='number', value=2022, className="form-control"),
-                ], className="col-md-3"),
+                    dcc.Slider(
+                        id='drill-down-year-slider',
+                        min=2010,
+                        max=2022,
+                        step=1,
+                        marks={i: str(i) for i in range(2010, 2023)},
+                        value=2022
+                    ),
+                ], className="col-md-8"),
                 html.Div([
-                    html.Button('Update', id='drill-down-update-button', n_clicks=0, className="btn btn-primary mt-4"),
-                ], className="col-md-2"),
+                    html.Label("Metric:", className="form-label"),
+                    dcc.RadioItems(
+                        id='drill-down-metric',
+                        options=[
+                            {'label': 'Games Released', 'value': 'games_released'},
+                            {'label': 'Average Price', 'value': 'avg_price'}
+                        ],
+                        value='games_released',
+                        className="form-check"
+                    ),
+                ], className="col-md-4"),
             ], className="row g-3 mb-3"),
             dcc.Graph(id='drill-down-graph')
         ]),
@@ -151,26 +180,46 @@ app.layout = html.Div([
                         value='windows',
                         className="form-select"
                     ),
-                ], className="col-md-3"),
+                ], className="col-md-4"),
                 html.Div([
-                    html.Button('Update', id='slice-dice-update-button', n_clicks=0, className="btn btn-primary mt-4"),
-                ], className="col-md-2"),
+                    html.Label("Price Range:", className="form-label"),
+                    dcc.RangeSlider(
+                        id='slice-dice-price-range',
+                        min=0,
+                        max=100,
+                        step=5,
+                        marks={i: f"${i}" for i in range(0, 101, 20)},
+                        value=[0, 100]
+                    ),
+                ], className="col-md-8"),
             ], className="row g-3 mb-3"),
             dcc.Graph(id='slice-dice-graph')
         ]),
         dcc.Tab(label='Pivot', children=[
             html.Div([
                 html.Div([
-                    html.Label("Start Year:", className="form-label"),
-                    dcc.Input(id='pivot-start-year', type='number', value=2010, className="form-control"),
-                ], className="col-md-3"),
+                    html.Label("Year Range:", className="form-label"),
+                    dcc.RangeSlider(
+                        id='pivot-year-slider',
+                        min=2010,
+                        max=2022,
+                        step=1,
+                        marks={i: str(i) for i in range(2010, 2023, 2)},
+                        value=[2010, 2022]
+                    ),
+                ], className="col-md-8"),
                 html.Div([
-                    html.Label("End Year:", className="form-label"),
-                    dcc.Input(id='pivot-end-year', type='number', value=2022, className="form-control"),
-                ], className="col-md-3"),
-                html.Div([
-                    html.Button('Update', id='pivot-update-button', n_clicks=0, className="btn btn-primary mt-4"),
-                ], className="col-md-2"),
+                    html.Label("View:", className="form-label"),
+                    dcc.RadioItems(
+                        id='pivot-view',
+                        options=[
+                            {'label': 'Stacked', 'value': 'stack'},
+                            {'label': 'Grouped', 'value': 'group'}
+                        ],
+                        value='stack',
+                        className="form-check"
+                    ),
+                ], className="col-md-4"),
             ], className="row g-3 mb-3"),
             dcc.Graph(id='pivot-graph')
         ])
@@ -179,11 +228,17 @@ app.layout = html.Div([
 
 @app.callback(
     Output('roll-up-graph', 'figure'),
-    Input('roll-up-update-button', 'n_clicks'),
-    State('roll-up-start-year', 'value'),
-    State('roll-up-end-year', 'value')
+    Input('roll-up-year-slider', 'value'),
+    Input('roll-up-preset', 'value')
 )
-def update_roll_up_graph(n_clicks, start_year, end_year):
+def update_roll_up_graph(year_range, preset):
+    if preset == 'last_5':
+        start_year, end_year = 2018, 2022
+    elif preset == 'last_10':
+        start_year, end_year = 2013, 2022
+    else:
+        start_year, end_year = year_range
+    
     roll_up_query = f"""
     SELECT 
         dt.year,
@@ -210,10 +265,10 @@ def update_roll_up_graph(n_clicks, start_year, end_year):
 
 @app.callback(
     Output('drill-down-graph', 'figure'),
-    Input('drill-down-update-button', 'n_clicks'),
-    State('drill-down-year', 'value')
+    Input('drill-down-year-slider', 'value'),
+    Input('drill-down-metric', 'value')
 )
-def update_drill_down_graph(n_clicks, year):
+def update_drill_down_graph(year, metric):
     drill_down_query = f"""
     SELECT 
         dt.year,
@@ -234,24 +289,30 @@ def update_drill_down_graph(n_clicks, year):
     df_drill_down = pd.read_sql(drill_down_query, engine)
     
     fig = go.Figure()
-    fig.add_trace(go.Bar(x=df_drill_down['month'], y=df_drill_down['games_released'], name='Games Released'))
-    fig.add_trace(go.Scatter(x=df_drill_down['month'], y=df_drill_down['avg_price'], name='Avg Price', yaxis='y2'))
-    fig.update_layout(title=f'Monthly Games Released and Average Price ({year})',
-                      xaxis_title='Month', yaxis_title='Games Released', yaxis2=dict(title='Avg Price', overlaying='y', side='right'))
+    if metric == 'games_released':
+        fig.add_trace(go.Bar(x=df_drill_down['month'], y=df_drill_down['games_released'], name='Games Released'))
+        title = f'Monthly Games Released ({year})'
+        y_title = 'Games Released'
+    else:
+        fig.add_trace(go.Bar(x=df_drill_down['month'], y=df_drill_down['avg_price'], name='Avg Price'))
+        title = f'Monthly Average Price ({year})'
+        y_title = 'Avg Price'
+    
+    fig.update_layout(title=title, xaxis_title='Month', yaxis_title=y_title)
     return fig
 
 @app.callback(
     Output('slice-dice-graph', 'figure'),
-    Input('slice-dice-update-button', 'n_clicks'),
-    State('slice-dice-platform', 'value')
+    Input('slice-dice-platform', 'value'),
+    Input('slice-dice-price-range', 'value')
 )
-def update_slice_dice_graph(n_clicks, platform):
+def update_slice_dice_graph(platform, price_range):
     slice_dice_query = f"""
     SELECT 
         CASE 
-            WHEN dg.price < 10 THEN 'Under $10'
-            WHEN dg.price >= 10 AND dg.price < 30 THEN '$10 - $29.99'
-            ELSE '$30 and above'
+            WHEN dg.price < {price_range[0]} THEN 'Under ${price_range[0]}'
+            WHEN dg.price >= {price_range[0]} AND dg.price < {price_range[1]} THEN '${price_range[0]} - ${price_range[1]}'
+            ELSE '${price_range[1]} and above'
         END AS price_range,
         CASE 
             WHEN dg.metacritic_score < 50 THEN 'Low'
@@ -278,11 +339,10 @@ def update_slice_dice_graph(n_clicks, platform):
 
 @app.callback(
     Output('pivot-graph', 'figure'),
-    Input('pivot-update-button', 'n_clicks'),
-    State('pivot-start-year', 'value'),
-    State('pivot-end-year', 'value')
+    Input('pivot-year-slider', 'value'),
+    Input('pivot-view', 'value')
 )
-def update_pivot_graph(n_clicks, start_year, end_year):
+def update_pivot_graph(year_range, view):
     pivot_query = f"""
     SELECT 
         dt.year,
@@ -298,7 +358,7 @@ def update_pivot_graph(n_clicks, start_year, end_year):
     JOIN dim_time dt ON fgs.time_key = dt.time_key
     JOIN dim_platform dp ON fgs.platform_key = dp.platform_key
     WHERE
-        dt.year BETWEEN {start_year} AND {end_year}
+        dt.year BETWEEN {year_range[0]} AND {year_range[1]}
     GROUP BY 
         dt.year
     ORDER BY 
@@ -309,7 +369,7 @@ def update_pivot_graph(n_clicks, start_year, end_year):
     fig = go.Figure()
     for column in df_pivot.columns[1:]:  # Skip the 'year' column
         fig.add_trace(go.Bar(x=df_pivot['year'], y=df_pivot[column], name=column))
-    fig.update_layout(title='Games Released by Platform Combination', xaxis_title='Year', yaxis_title='Number of Games', barmode='stack')
+    fig.update_layout(title='Games Released by Platform Combination', xaxis_title='Year', yaxis_title='Number of Games', barmode=view)
     return fig
 
 if __name__ == '__main__':
