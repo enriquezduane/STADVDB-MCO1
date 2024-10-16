@@ -102,58 +102,80 @@ df_drill_down = pd.read_sql(drill_down_query, engine)
 df_slice_dice = pd.read_sql(slice_dice_query, engine)
 df_pivot = pd.read_sql(pivot_query, engine)
 
-app = dash.Dash(__name__)
+external_stylesheets = ['https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css']
+
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 app.layout = html.Div([
-    html.H1("Game Sales Dashboard"),
-    
+    html.H1("Steam Games OLAP Dashboard", className="text-center my-4"),
     dcc.Tabs([
         dcc.Tab(label='Roll Up', children=[
             html.Div([
-                html.Label("Start Year:"),
-                dcc.Input(id='roll-up-start-year', type='number', value=2010),
-                html.Label("End Year:"),
-                dcc.Input(id='roll-up-end-year', type='number', value=2022),
-                html.Button('Update', id='roll-up-update-button', n_clicks=0)
-            ]),
+                html.Div([
+                    html.Label("Start Year:", className="form-label"),
+                    dcc.Input(id='roll-up-start-year', type='number', value=2010, className="form-control"),
+                ], className="col-md-3"),
+                html.Div([
+                    html.Label("End Year:", className="form-label"),
+                    dcc.Input(id='roll-up-end-year', type='number', value=2022, className="form-control"),
+                ], className="col-md-3"),
+                html.Div([
+                    html.Button('Update', id='roll-up-update-button', n_clicks=0, className="btn btn-primary mt-4"),
+                ], className="col-md-2"),
+            ], className="row g-3 mb-3"),
             dcc.Graph(id='roll-up-graph')
         ]),
         dcc.Tab(label='Drill Down', children=[
             html.Div([
-                html.Label("Year:"),
-                dcc.Input(id='drill-down-year', type='number', value=2022),
-                html.Button('Update', id='drill-down-update-button', n_clicks=0)
-            ]),
+                html.Div([
+                    html.Label("Year:", className="form-label"),
+                    dcc.Input(id='drill-down-year', type='number', value=2022, className="form-control"),
+                ], className="col-md-3"),
+                html.Div([
+                    html.Button('Update', id='drill-down-update-button', n_clicks=0, className="btn btn-primary mt-4"),
+                ], className="col-md-2"),
+            ], className="row g-3 mb-3"),
             dcc.Graph(id='drill-down-graph')
         ]),
         dcc.Tab(label='Slice and Dice', children=[
             html.Div([
-                html.Label("Platform:"),
-                dcc.Dropdown(
-                    id='slice-dice-platform',
-                    options=[
-                        {'label': 'Windows', 'value': 'windows'},
-                        {'label': 'Mac', 'value': 'mac'},
-                        {'label': 'Linux', 'value': 'linux'}
-                    ],
-                    value='windows'
-                ),
-                html.Button('Update', id='slice-dice-update-button', n_clicks=0)
-            ]),
+                html.Div([
+                    html.Label("Platform:", className="form-label"),
+                    dcc.Dropdown(
+                        id='slice-dice-platform',
+                        options=[
+                            {'label': 'Windows', 'value': 'windows'},
+                            {'label': 'Mac', 'value': 'mac'},
+                            {'label': 'Linux', 'value': 'linux'}
+                        ],
+                        value='windows',
+                        className="form-select"
+                    ),
+                ], className="col-md-3"),
+                html.Div([
+                    html.Button('Update', id='slice-dice-update-button', n_clicks=0, className="btn btn-primary mt-4"),
+                ], className="col-md-2"),
+            ], className="row g-3 mb-3"),
             dcc.Graph(id='slice-dice-graph')
         ]),
         dcc.Tab(label='Pivot', children=[
             html.Div([
-                html.Label("Start Year:"),
-                dcc.Input(id='pivot-start-year', type='number', value=2010),
-                html.Label("End Year:"),
-                dcc.Input(id='pivot-end-year', type='number', value=2022),
-                html.Button('Update', id='pivot-update-button', n_clicks=0)
-            ]),
+                html.Div([
+                    html.Label("Start Year:", className="form-label"),
+                    dcc.Input(id='pivot-start-year', type='number', value=2010, className="form-control"),
+                ], className="col-md-3"),
+                html.Div([
+                    html.Label("End Year:", className="form-label"),
+                    dcc.Input(id='pivot-end-year', type='number', value=2022, className="form-control"),
+                ], className="col-md-3"),
+                html.Div([
+                    html.Button('Update', id='pivot-update-button', n_clicks=0, className="btn btn-primary mt-4"),
+                ], className="col-md-2"),
+            ], className="row g-3 mb-3"),
             dcc.Graph(id='pivot-graph')
         ])
-    ])
-])
+    ], className="nav nav-tabs")
+], className="container")
 
 @app.callback(
     Output('roll-up-graph', 'figure'),

@@ -19,8 +19,12 @@ pip3 install -r dependencies.txt
 python3 cleanup.py
 python3 etl.py
 
+# run the tests
+python3 test.py
+
 # run the server
 python3 server.py
+
 
 # clean up
 docker-compose down -v
