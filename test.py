@@ -9,13 +9,13 @@ db = mysql.connector.connect(
     database="steam_games_data_warehouse"
 )
 
-def run_test_case(query, description, expected_output_type=None):  # Added description and output type
+def run_test_case(query, description, expected_output_type=None):
     start_time = time.time()
     cursor = db.cursor()
     try:
       cursor.execute(query)
-      if expected_output_type == "count": # Check if we expect a single count
-          results = cursor.fetchone()[0] # Fetch single count value
+      if expected_output_type == "count": # check if single count
+          results = cursor.fetchone()[0] # fetch single count value
       else:
           results = cursor.fetchall()
     except Exception as e:
@@ -27,7 +27,7 @@ def run_test_case(query, description, expected_output_type=None):  # Added descr
     return execution_time, results
 
 
-# Test cases (improved structure and added expected output type)
+# test cases
 test_cases = [
     {"description": "Roll Up - Average Metacritic Score and Total Recommendations by Year",
      "query": """
@@ -123,19 +123,19 @@ test_cases = [
 ]
 
 # execute tests and record results (multiple runs)
-num_runs = 3  # Number of test runs
+num_runs = 3  # number of test runs
 test_results = []
 
 for test_case in test_cases:
-    if "parameters" in test_case:  # Parameterized query
+    if "parameters" in test_case:  # parameterized query
         for params in test_case["parameters"]:
             execution_times = []
             if isinstance(params, dict):
                 query = test_case["query"].format(**params)
-                description = test_case["description"].format(**params)  # Format description
-            else:  # Assumes other parameter types are suitable for % formatting
+                description = test_case["description"].format(**params)  # format description
+            else:  # other param types
                 query = test_case["query"].format(year=params)
-                description = test_case["description"].format(year=params) #Assumes its a year parameter, format accordingly
+                description = test_case["description"].format(year=params) # format year param
 
 
             for _ in range(num_runs):
@@ -143,30 +143,30 @@ for test_case in test_cases:
                 execution_times.append(execution_time)
             avg_execution_time = sum(execution_times) / num_runs
             test_results.append({
-                "test_case": {"description": description},  # Store formatted description
+                "test_case": {"description": description},  # store formatted description
                 "execution_times": execution_times,
                 "avg_execution_time": avg_execution_time
             })
-    else:  # Non-parameterized query
+    else:  # non-parameterized query
         execution_times = []
         for _ in range(num_runs):
             execution_time, _ = run_test_case(test_case["query"], test_case["description"])
             execution_times.append(execution_time)
         avg_execution_time = sum(execution_times) / num_runs
         test_results.append({
-            "test_case": test_case,  # No formatting needed
+            "test_case": test_case,  # no formatting
             "execution_times": execution_times,
             "avg_execution_time": avg_execution_time
         })
 
-# Write execution times to the file
+# write execution times to the file
 with open("dataset/test_results.txt", "w") as f:
     for result in test_results:
         f.write(f"Test Case: {result['test_case']['description']}\n")
         for i, execution_time in enumerate(result['execution_times']):
              f.write(f"Run {i+1} Execution Time: {execution_time:.4f} seconds\n")
         f.write(f"Average Execution Time: {result['avg_execution_time']:.4f} seconds\n")
-        f.write("-" * 20 + "\n")  # Separator between test cases
+        f.write("-" * 20 + "\n")  # separator between test cases
 
 db.close()
 print("Test results written to test_results.txt")
