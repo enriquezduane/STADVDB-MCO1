@@ -116,10 +116,10 @@ app.layout = html.Div([
                     dcc.RangeSlider(
                         id='roll-up-year-slider',
                         min=2010,
-                        max=2022,
+                        max=2025,
                         step=1,
-                        marks={i: str(i) for i in range(2010, 2023, 2)},
-                        value=[2010, 2022]
+                        marks={i: str(i) for i in range(2010, 2026, 1)},
+                        value=[2010, 2026]
                     ),
                 ], className="col-md-8"),
                 html.Div([
@@ -145,10 +145,10 @@ app.layout = html.Div([
                     dcc.Slider(
                         id='drill-down-year-slider',
                         min=2010,
-                        max=2022,
+                        max=2025,
                         step=1,
-                        marks={i: str(i) for i in range(2010, 2023)},
-                        value=2022
+                        marks={i: str(i) for i in range(2010, 2026)},
+                        value=2025
                     ),
                 ], className="col-md-8"),
                 html.Div([
@@ -202,10 +202,10 @@ app.layout = html.Div([
                     dcc.RangeSlider(
                         id='pivot-year-slider',
                         min=2010,
-                        max=2022,
+                        max=2025,
                         step=1,
-                        marks={i: str(i) for i in range(2010, 2023, 2)},
-                        value=[2010, 2022]
+                        marks={i: str(i) for i in range(2010, 2026, 1)},
+                        value=[2010, 2025]
                     ),
                 ], className="col-md-8"),
                 html.Div([
@@ -233,9 +233,9 @@ app.layout = html.Div([
 )
 def update_roll_up_graph(year_range, preset):
     if preset == 'last_5':
-        start_year, end_year = 2018, 2022
+        start_year, end_year = 2018, 2025
     elif preset == 'last_10':
-        start_year, end_year = 2013, 2022
+        start_year, end_year = 2013, 2025
     else:
         start_year, end_year = year_range
     
