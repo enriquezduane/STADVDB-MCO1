@@ -1,10 +1,10 @@
 # STADVB-MCO1-Group1
-## Members:
-### Duane Enriquez
-### Rafael Hugo
-### Joshua Tating
-### Acemere Villena
+ Members: <br />
+ Duane Enriquez <br />
+ Rafael Hugo <br />
+ Joshua Tating <br />
+ Acemere Villena <br /><br />
 
-Scripts to run the program (Docker installation required)
-Windows -> run-windows.ps1
-Mac -> run.sh
+Scripts to run the program (Docker installation required) <br />
+Windows -> run-windows.ps1 <br />
+Mac -> run.sh <br />
